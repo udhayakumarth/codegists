@@ -34,21 +34,17 @@ public class GoogleAuthService {
         return GOOGLE_AUTH_URL + "?client_id=" + CLIENT_ID
                 + "&redirect_uri=" + REDIRECT_URI
                 + "&response_type=code"
-                + "&scope=email";
+                + "&scope=email%20profile";
     }
 
     public String authenticateWithGoogle(String code) {
-        // Exchange authorization code for access token
         String accessToken = getAccessToken(code);
-
-        // Fetch user info from Google
         User googleUser = getUserInfo(accessToken);
 
         // Store user if not exists
         User user = userRepository.findByEmail(googleUser.getEmail())
-                .orElseGet(() -> userRepository.save(new User(googleUser.getEmail(), googleUser.getName(), googleUser.getPicture())));
+                .orElseGet(() -> userRepository.save(googleUser));
 
-        // Generate JWT
         return jwtService.generateToken(user);
     }
 
@@ -74,8 +70,23 @@ public class GoogleAuthService {
         headers.set("Authorization", "Bearer " + accessToken);
 
         HttpEntity<String> request = new HttpEntity<>(headers);
-        ResponseEntity<User> response = restTemplate.exchange(GOOGLE_USERINFO_URL, HttpMethod.GET, request, User.class);
+        ResponseEntity<Map> response = restTemplate.exchange(
+                GOOGLE_USERINFO_URL,
+                HttpMethod.GET,
+                request,
+                Map.class
+        );
+        Map<String, Object> googleUser = response.getBody();
+        if (googleUser == null || !googleUser.containsKey("id")) {
+            throw new RuntimeException("Invalid Google OAuth Response");
+        }
+        String email = (String) googleUser.get("email");
+        String username = email.split("@")[0];
+        username = username.replaceAll("[^a-zA-Z0-9]", "");
+        String firstName = (String) googleUser.get("given_name");
+        String lastName = (String) googleUser.get("family_name");
+        String picture = (String) googleUser.get("picture");
 
-        return response.getBody();
+        return new User(email,username,firstName,lastName,picture);
     }
 }

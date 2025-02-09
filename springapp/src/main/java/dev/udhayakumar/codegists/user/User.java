@@ -1,8 +1,13 @@
 package dev.udhayakumar.codegists.user;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.Id;
+import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.mongodb.core.mapping.Document;
+
+import java.time.LocalDateTime;
+import java.util.Date;
 
 @Document(collection = "user")
 @JsonInclude(JsonInclude.Include.NON_NULL)
@@ -10,13 +15,37 @@ public class User {
     @Id
     private String id;
     private String email;
-    private String name;
+    private String userName;
+    private String firstName;
+    private String lastName;
     private String picture;
+    @CreatedDate
+    private Date createdAt;
+    @LastModifiedDate
+    private Date updatedAt;
 
-    public User(String email, String name, String picture) {
+    public User(String email, String userName, String firstName, String lastName, String picture) {
         this.email = email;
-        this.name = name;
+        this.userName = userName;
+        this.firstName = firstName;
+        this.lastName = lastName;
         this.picture = picture;
+    }
+
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
+    }
+
+    public String getUserName() {
+        return userName;
+    }
+
+    public void setUserName(String userName) {
+        this.userName = userName;
     }
 
     public String getEmail() {
@@ -27,12 +56,20 @@ public class User {
         this.email = email;
     }
 
-    public String getName() {
-        return name;
+    public String getFirstName() {
+        return firstName;
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public void setFirstName(String firstName) {
+        this.firstName = firstName;
+    }
+
+    public String getLastName() {
+        return lastName;
+    }
+
+    public void setLastName(String lastName) {
+        this.lastName = lastName;
     }
 
     public String getPicture() {
@@ -43,11 +80,19 @@ public class User {
         this.picture = picture;
     }
 
-    public String getId() {
-        return id;
+    public Date getCreatedAt() {
+        return createdAt;
     }
 
-    public void setId(String id) {
-        this.id = id;
+    public void setCreatedAt(Date createdAt) {
+        this.createdAt = createdAt;
+    }
+
+    public Date getUpdatedAt() {
+        return updatedAt;
+    }
+
+    public void setUpdatedAt(Date updatedAt) {
+        this.updatedAt = updatedAt;
     }
 }
