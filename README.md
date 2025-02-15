@@ -15,57 +15,123 @@
 - users
 
 ### Endpoint
-- GET /api/auth/login/google
-- GET /api/auth/login/google/callback
-- POST /api/snippet/{userName}
-  body:
+- `GET /api/auth/login/google`
+- `GET /api/auth/login/google/callback`
+- `POST /api/snippet/{userName}`
   ```
+  #Request-body
   {
-		  
-		"description": #values
-		"isPublic": true
+		"description": #values,
+		"isPublic": true,
 		"content":[{
 			"fileName": "Udhaya.java",
-			"fileContent": #values
+			"fileContent": #values,
+			"language": #value,
 		},
 		{
 			"fileName": "Kumar.java",
-			"fileContent": #values
+			"fileContent": #values,
+			"language": #value,
 		}]	
   }
+  #Responce
+	status: 201 CREATED
+	location: /api/snippet/{userName}/{snippetId}
   ```
-Respose - Status: 302, location: /api/snippet/{userName}/{fileName}
-
-- PUT /api/snippet/{userName}/{snippetId}
-    body:
-  ```
+  
+- `POST /api/snippet/{userName}/{snippetId}`
+	```
+  #Request-body
   {
-		"description": #values
-		"isPublic": false
+		"description": #values,
+		"isPublic": false,
 		"content":[{
-			#existingFileUpdate
-			"fileId": #value
+			#existingFile
+			"fileId": #value,
 			"fileName": "Udhaya.java",
 			"fileContent": #values,
+			"language": #value,
+			"type": "Intact"
+		},
+		{
+			#existingFileUpdate
+			"fileId": #value,
+			"fileName": "Udhaya.java",
+			"fileContent": #values,
+			"language": #value,
 			"type": "update"
 		},
 		{
 			##deleteFile
-			"fileId": #value
+			"fileId": #value,
 			"fileName": "Uk.java",
 			"fileContent": #values,
+			"language": #value,
 			"type": "delete"
 		},
 		{
 			#newFile
 			"fileName": "Kumar.java",
-			"fileContent": #values
+			"fileContent": #values,
+			"language": #value,
 			"type": "new"
 		}]	
   }
+    #Responce
+	status: 200 OK
+	location: /api/snippet/{userName}/{snippetId}
   ```
   
-- DELETE /api/snipprt/{username}/{snippetId}
-- GET /api/snippet/{userName}/{snippetId}
-- GET /api/snippet/{userName}/{snippetId}/versions
-- GET /api/snippet/{userName}/{snippetId}/{versionsId}
+- `DELETE /api/snipprt/{username}/{snippetId}`
+```
+#Responce
+	status: 204 No Content
+```
+
+- `GET /api/snippet/{userName}/{snippetId}`
+```
+#Responce-body
+{
+	{
+		"snippetId": #value,
+		"versionsId": #value,
+		"description": #values,
+		"isPublic": false,
+		"content":[{
+			"fileId": #value,
+			"fileName": "Udhaya.java",
+			"fileContent": #values,
+			"language": #value,	
+		},
+		{
+			"fileId": #value,
+			"fileName": "Udhaya.java",
+			"fileContent": #values,
+			"language": #value,
+		},
+		{
+			"fileId": #value,
+			"fileName": "Uk.java",
+			"fileContent": #value,
+			"language": #value,
+		},
+		{
+			"fileId": #value,
+			"fileName": "Kumar.java",
+			"fileContent": #values,
+			"language": #value,
+		}]
+		"createdAt": #value,
+		"updateAt": #value,
+		"createdBy": #value,
+		"updateBy": #value
+  }
+}
+```
+- `GET /api/snippet/{userName}/{snippetId}/versions`
+- `GET /api/snippet/{userName}/{snippetId}/{versionsId}`
+
+------------
+### For login
+http://localhost:8080/api/auth/login/google/callback
+http://localhost:8080/api/auth/login/google
