@@ -118,7 +118,7 @@ public class SnippetController {
             log.warn("Unauthorized snippet edit attempt by user: {}", authUsername);
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body(null);
         } catch (Exception e) {
-            log.error("Error occurred while saving snippet for user: {} - {}", userName, e.getMessage(), e);
+            log.error("Error occurred while editing snippet for user: {} - {}", userName, e.getMessage(), e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
         }
     }
@@ -126,7 +126,21 @@ public class SnippetController {
     @Operation
     @DeleteMapping("/{userName}/{snippetId}")
     public ResponseEntity<?> deleteSnippet(@PathVariable String userName, @PathVariable String snippetId){
-        //To-do
-        return null;
+        String authUsername = AuthUtil.getAuthenticatedUsername();
+        log.info("Received request to delete snippet for snippetId: {}", snippetId);
+
+        try {
+            log.info("userName.equals(authUsername):{},{}",userName,authUsername);
+            if (userName.equals(authUsername)) {
+                snippetService.deleteSnippet(snippetId);
+                log.info("Snippet delete successfully for snippetId: {}", snippetId);
+                return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
+            }
+            log.warn("Unauthorized snippet delete attempt by user: {}", authUsername);
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(null);
+        } catch (Exception e) {
+            log.error("Error occurred while deleting snippet for user: {} - {}", userName, e.getMessage(), e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+        }
     }
 }

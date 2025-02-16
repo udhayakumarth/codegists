@@ -63,4 +63,7 @@ public class SnippetService {
         return snippetRepository.save(snippet).getSnippetId();
     }
 
+    public void deleteSnippet(String snippetId) {
+        snippetRepository.delete(findSnippetById(snippetId));
+    }
 }
