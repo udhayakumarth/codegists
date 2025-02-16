@@ -1,4 +1,6 @@
 ## Designing CodeGists
+Api Documentation:
+https://documenter.getpostman.com/view/21272460/2sAYXEFJpg
 
 ### Types of snippets
 - Public snippets – accessible to everyone 
@@ -134,4 +136,5 @@
 ------------
 ### For login
 http://localhost:8080/api/auth/login/google/callback
+
 http://localhost:8080/api/auth/login/google
