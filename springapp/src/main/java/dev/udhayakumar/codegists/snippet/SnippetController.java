@@ -1,6 +1,8 @@
 package dev.udhayakumar.codegists.snippet;
 
 import dev.udhayakumar.codegists.auth.AuthUtil;
+import dev.udhayakumar.codegists.version.SnippetVersion;
+import dev.udhayakumar.codegists.version.SnippetVersionService;
 import io.swagger.v3.oas.annotations.Operation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -18,11 +20,14 @@ import java.util.List;
 public class SnippetController {
 
     @Autowired
-    SnippetService snippetService;
+    private SnippetService snippetService;
+
+    @Autowired
+    private SnippetVersionService snippetVersionService;
 
     Logger log = LoggerFactory.getLogger(SnippetController.class);
 
-    @Operation(summary = "To Submit New Snippet")
+    @Operation
     @PostMapping("/{userName}")
     public ResponseEntity<?> saveSnippet(@PathVariable String userName,@RequestBody Snippet snippet){
         String authUsername = AuthUtil.getAuthenticatedUsername();
@@ -30,7 +35,6 @@ public class SnippetController {
 
         try{
             if(userName.equals(authUsername)){
-                log.info("User authentication successful. Authenticated user: {}", authUsername);
 
                 //setting userName in snippet
                 snippet.setUserName(userName);
@@ -53,36 +57,70 @@ public class SnippetController {
         }
     }
 
-    @Operation(summary = "To find Snippets")
+    @Operation
     @GetMapping("/{userName}")
     public ResponseEntity<?> findSnippet(@PathVariable String userName){
         String authUsername = AuthUtil.getAuthenticatedUsername();
-        if(userName.equals(authUsername)){
-            List<Snippet> snippets = snippetService.findSnippet(userName);
-            if(!snippets.isEmpty()){
-                return ResponseEntity.status(HttpStatus.OK).body(snippets);
-            }
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
-        }
-        return ResponseEntity.status(HttpStatus.FORBIDDEN).body(null);
-    }
+        log.info("Received request to find all snippet for user: {}", userName);
 
-    @Operation(summary = "To find Snippet")
-    @GetMapping("/{userName}/{snippetId}")
-    public ResponseEntity<?> findSnippet(@PathVariable String userName, @PathVariable String snippetId){
-        String authUsername = AuthUtil.getAuthenticatedUsername();
-        Snippet snippet = snippetService.findSnippetById(userName,snippetId);
-        if(!snippet.getPublic() && userName.equals(authUsername)){
-            return ResponseEntity.status(HttpStatus.OK).body(snippet);
+        try{
+            if(userName.equals(authUsername)){
+                List<Snippet> snippets = snippetService.findSnippet(userName);
+                if(!snippets.isEmpty()){
+                    return ResponseEntity.status(HttpStatus.OK).body(snippets);
+                }
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+            }
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(null);
+        } catch (Exception e) {
+            log.error("Error occurred while finding all snippets for user: {} - {}", userName, e.getMessage(), e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
         }
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
     }
 
     @Operation
-    @PutMapping("/{userName}/{snippetId}")
-    public ResponseEntity<?> editSnippet(@PathVariable String userName, @PathVariable String snippetId){
-        //To-do
-        return null;
+    @GetMapping("/{userName}/{snippetId}")
+    public ResponseEntity<?> findSnippet(@PathVariable String userName, @PathVariable String snippetId){
+        String authUsername = AuthUtil.getAuthenticatedUsername();
+        log.info("Received request to find snippet for snippetId: /{}/{}", userName,snippetId);
+
+        try {
+            Snippet snippet = snippetService.findSnippetById(snippetId);
+            log.info("Snippet found successfully for snippetId: {}", snippetId);
+            if(!snippet.getUserName().equals(userName))
+                log.info("Snippet belongs to different user. snippetId: {}", snippetId);
+            if(userName.equals(authUsername) || snippet.getPublic())
+                return ResponseEntity.status(HttpStatus.OK).body(snippet);
+
+            log.info("Unauthorized access snippet is not public for snippetId: {}", snippetId);
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+        } catch (Exception e) {
+            log.error("Error occurred while finding snippet for snippetId: {} - {}", snippetId, e.getMessage(), e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+        }
+    }
+
+    @Operation
+    @PutMapping("/{userName}")
+    public ResponseEntity<?> editSnippet(@PathVariable String userName, @RequestBody SnippetVersion snippetVersion){
+        String authUsername = AuthUtil.getAuthenticatedUsername();
+        log.info("Received request to edit snippet for user: {}", userName);
+
+        try {
+            if (userName.equals(authUsername)) {
+                String snippetIdAfterUpdate = snippetService.editSnippet(snippetVersion);
+                log.info("Snippet edited successfully for snippetId: {}", snippetIdAfterUpdate);
+                snippetVersion.setUserName(userName);
+                String oldSnippetVersionId = snippetVersionService.save(snippetVersion);
+                log.info("Snippet old version saved successfully with versionId: {}", oldSnippetVersionId);
+                return ResponseEntity.status(HttpStatus.OK).body(snippetIdAfterUpdate);
+            }
+            log.warn("Unauthorized snippet edit attempt by user: {}", authUsername);
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(null);
+        } catch (Exception e) {
+            log.error("Error occurred while saving snippet for user: {} - {}", userName, e.getMessage(), e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+        }
     }
 
     @Operation

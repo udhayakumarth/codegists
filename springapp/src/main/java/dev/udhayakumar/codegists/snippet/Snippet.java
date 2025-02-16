@@ -22,6 +22,13 @@ public class Snippet {
     @LastModifiedDate
     private Date updatedAt;
 
+    public Snippet(String snippetId, String description, Boolean isPublic, String userName) {
+        this.snippetId = snippetId;
+        this.description = description;
+        this.isPublic = isPublic;
+        this.userName = userName;
+    }
+
     public String getSnippetId() {
         return snippetId;
     }
@@ -76,5 +83,25 @@ public class Snippet {
 
     public void setUpdatedAt(Date updatedAt) {
         this.updatedAt = updatedAt;
+    }
+
+    public void addFile(File file){
+        files.add(file);
+    }
+
+    public File getFileById(String fileId) {
+        return files.stream()
+                .filter(file -> file.getFileId().equals(fileId))
+                .findFirst()
+                .orElse(null); // Return null if not found
+    }
+
+    public int getFileIndexByFileId(String fileId){
+        for (int i = 0; i < files.size(); i++) {
+            if (files.get(i).getFileId().equals(fileId)) {
+                return i;
+            }
+        }
+        return -1;
     }
 }
