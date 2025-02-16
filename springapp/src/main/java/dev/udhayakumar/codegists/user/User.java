@@ -13,7 +13,7 @@ import java.util.Date;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class User {
     @Id
-    private String id;
+    private String userId;
     private String email;
     private String userName;
     private String firstName;
@@ -32,12 +32,12 @@ public class User {
         this.picture = picture;
     }
 
-    public String getId() {
-        return id;
+    public String getUserId() {
+        return userId;
     }
 
-    public void setId(String id) {
-        this.id = id;
+    public void setUserId(String userId) {
+        this.userId = userId;
     }
 
     public String getUserName() {
