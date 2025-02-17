@@ -56,6 +56,10 @@ jobs:
         VERSION=$(basename ${{ env.JAR_NAME }} .jar | sed 's/^springapp-//')
         echo "VERSION=$VERSION" >> $GITHUB_ENV
     
-    - uses: ncipollo/release-action@v1
+   # Create GitHub Release and upload JAR file
+    - name: Create Release and Upload JAR
+      uses: softprops/action-gh-release@v1
       with:
-        artifacts: "./springapp/build/libs/${{ env.JAR_NAME }}t"
+        files: ./springapp/build/libs/${{ env.JAR_NAME }}
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
