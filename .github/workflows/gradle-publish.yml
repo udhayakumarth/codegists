@@ -47,27 +47,3 @@ jobs:
     - name: Build with Gradle
       run: ./gradlew build
 
-    - name: Get the JAR file name
-      id: jar_name
-      run: echo "JAR_NAME=$(ls ./springapp/build/libs/*.jar | xargs -n 1 basename)" >> $GITHUB_ENV
-
-    - name: Extract version from JAR file name
-      id: version
-      run: |
-        VERSION=$(basename ${{ env.JAR_NAME }} .jar | sed 's/^springapp-//')
-        echo "VERSION=$VERSION" >> $GITHUB_ENV
-    
-  # Create a Git tag
-    - name: Create Git tag
-      run: |
-        git tag "v${{ env.VERSION }}"
-        git push origin "v${{ env.VERSION }}"
-
-      # Create GitHub Release and Upload JAR
-    - name: Create Release and Upload JAR
-      uses: softprops/action-gh-release@v1
-      with:
-        tag: "v${{ env.VERSION }}" # Ensure the release uses the correct tag
-        files: ./springapp/build/libs/${{ env.JAR_NAME }}
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
