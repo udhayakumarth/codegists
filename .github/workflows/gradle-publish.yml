@@ -56,17 +56,7 @@ jobs:
         VERSION=$(basename ${{ env.JAR_NAME }} .jar | sed 's/^springapp-//')
         echo "VERSION=$VERSION" >> $GITHUB_ENV
 
-    - name: Create a Release
-      uses: gh-cli/gh-release@v1
-      with:
-        tag_name: "v${{ env.VERSION }}"  # Use the version extracted from the JAR file
-        release_name: "Release v${{ env.VERSION }}"
-        body: "This is a release containing the built JAR file"
-        files: "./springapp/build/libs/${{ env.JAR_NAME }}"
-
-    - name: Upload JAR file to Release
-      uses: gh-cli/gh-release@v1
-      with:
-        tag_name: "v${{ env.VERSION }}"  # Match this with the same release tag used above
-        files: "./springapp/build/libs/${{ env.JAR_NAME }}"
-
+    - name: Create GitHub release
+      run: |
+        gh auth login --with-token < ${{ secrets.GITHUB_TOKEN }}
+        gh release create "v${{ env.VERSION }}" ./springapp/build/libs/${{ env.JAR_NAME }} --title "Release v${{ env.VERSION }}" --notes "Release for version ${{ env.VERSION }}"
