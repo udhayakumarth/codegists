@@ -46,10 +46,27 @@ jobs:
     - name: Build with Gradle
       run: ./gradlew build
 
-    # The USERNAME and TOKEN need to correspond to the credentials environment variables used in
-    # the publishing section of your build.gradle
-    - name: Publish to GitHub Packages
-      run: ./gradlew publish
-      env:
-        USERNAME: ${{ github.actor }}
-        TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    - name: Get the JAR file name
+      id: jar_name
+      run: echo "JAR_NAME=$(ls ./springapp/build/libs/*.jar | xargs -n 1 basename)" >> $GITHUB_ENV
+
+    - name: Extract version from JAR file name
+      id: version
+      run: |
+        VERSION=$(basename ${{ env.JAR_NAME }} .jar | sed 's/^springapp-//')
+        echo "VERSION=$VERSION" >> $GITHUB_ENV
+
+    - name: Create a Release
+      uses: gh-cli/gh-release@v1
+      with:
+        tag_name: "v${{ env.VERSION }}"  # Use the version extracted from the JAR file
+        release_name: "Release v${{ env.VERSION }}"
+        body: "This is a release containing the built JAR file"
+        files: "./springapp/build/libs/${{ env.JAR_NAME }}"
+
+    - name: Upload JAR file to Release
+      uses: gh-cli/gh-release@v1
+      with:
+        tag_name: "v${{ env.VERSION }}"  # Match this with the same release tag used above
+        files: "./springapp/build/libs/${{ env.JAR_NAME }}"
+
