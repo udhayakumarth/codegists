@@ -3,6 +3,7 @@ package dev.udhayakumar.codegists.auth;
 import dev.udhayakumar.codegists.user.User;
 import dev.udhayakumar.codegists.user.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 import org.springframework.util.LinkedMultiValueMap;
@@ -22,8 +23,11 @@ public class GoogleAuthService {
     @Autowired
     private UserRepository userRepository;
 
-    private static final String CLIENT_ID = AuthConstants.CLIENT_ID;
-    private static final String CLIENT_SECRET = AuthConstants.CLIENT_SECRET;
+    @Value("${GOOGLE_AUTH_CLIENT_ID}")
+    private String CLIENT_ID;
+
+    @Value("${GOOGLE_AUTH_CLIENT_SECRET}")
+    private String CLIENT_SECRET;
     private static final String REDIRECT_URI = "http://localhost:8080/api/auth/login/google/callback";
     private static final String GOOGLE_AUTH_URL = "https://accounts.google.com/o/oauth2/auth";
     private static final String GOOGLE_TOKEN_URL = "https://oauth2.googleapis.com/token";
