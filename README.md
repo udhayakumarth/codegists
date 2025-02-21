@@ -1,16 +1,18 @@
 ## Designing CodeGists
-Api Documentation:
+- Api Documentation: 
 https://documenter.getpostman.com/view/21272460/2sAYXEFJpg
 
-### Types of snippets
-- Public snippets – accessible to everyone 
-- Secret snippets – Only accessible to owner.
+- UI Desigin: 
+https://www.figma.com/design/zNWijW6x66dZ4hgGOKQDOQ/CodeGists
 
 ### Key Features
-- Version Control: Each update creates a new version.
-- Supports Multiple Files: Not limited to a single file.
+- Version Control
+- Supports Multiple Files
+- Public snippets
+- Secret snippets
 
-### DB Desigin
+### DB Desigin(Mongo)
+Collections:
 - snippets
 - files
 - versions
@@ -134,7 +136,7 @@ https://documenter.getpostman.com/view/21272460/2sAYXEFJpg
 - `GET /api/snippet/{userName}/{snippetId}/{versionsId}`
 
 ------------
-### For login
-http://localhost:8080/api/auth/login/google/callback
+### For Google login
+- http://localhost:8080/api/auth/login/google/callback
 
-http://localhost:8080/api/auth/login/google
+- http://localhost:8080/api/auth/login/google
