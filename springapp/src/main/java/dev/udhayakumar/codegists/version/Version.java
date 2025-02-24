@@ -1,22 +1,28 @@
-package dev.udhayakumar.codegists.snippet;
+package dev.udhayakumar.codegists.version;
 
-import org.bson.types.ObjectId;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.mongodb.core.mapping.Document;
 
-public class File {
+import java.util.Date;
+
+@Document(collection = "version")
+public class Version {
     private String fileId;
+    private String snippetId;
     private String fileName;
     private String fileContent;
     private String language;
+    private String type;
+    @CreatedDate
+    private Date createdAt;
 
-    public File() {
-        this.fileId = new ObjectId().toHexString();
+
+    public String getSnippetId() {
+        return snippetId;
     }
 
-    public File(String fileName, String fileContent, String language) {
-        this.fileId = new ObjectId().toHexString();
-        this.fileName = fileName;
-        this.fileContent = fileContent;
-        this.language = language;
+    public void setSnippetId(String snippetId) {
+        this.snippetId = snippetId;
     }
 
     public String getFileId() {
@@ -49,5 +55,13 @@ public class File {
 
     public void setLanguage(String language) {
         this.language = language;
+    }
+
+    public String getType() {
+        return type;
+    }
+
+    public void setType(String type) {
+        this.type = type;
     }
 }

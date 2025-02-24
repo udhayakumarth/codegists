@@ -1,11 +1,10 @@
 package dev.udhayakumar.codegists.snippet;
 
-import dev.udhayakumar.codegists.version.FileVersion;
-import dev.udhayakumar.codegists.version.SnippetVersion;
+import dev.udhayakumar.codegists.file.File;
+import dev.udhayakumar.codegists.version.Version;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -34,7 +33,7 @@ public class SnippetService {
         if(snippetVersion.getPublic() != null)
             snippet.setPublic(snippetVersion.getPublic());
         if(snippetVersion.getFiles() != null){
-            for (FileVersion fileVersion: snippetVersion.getFiles()){
+            for (Version fileVersion: snippetVersion.getFiles()){
                 switch (fileVersion.getType()) {
                     case "new" -> {
                         File file = new File(

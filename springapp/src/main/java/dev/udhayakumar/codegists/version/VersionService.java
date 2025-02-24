@@ -6,20 +6,20 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 
 @Service
-public class SnippetVersionService {
+public class VersionService {
 
     @Autowired
-    SnippetVersionRepository snippetVersionRepository;
+    VersionRepository snippetVersionRepository;
 
-    public String save(SnippetVersion snippetVersion) {
+    public String save(Version snippetVersion) {
         return snippetVersionRepository.save(snippetVersion).getVersionId();
     }
 
-    public List<SnippetVersion> findAllSnippetVersion(String snippetId) {
+    public List<Version> findAllSnippetVersion(String snippetId) {
         return snippetVersionRepository.findAllBySnippetId(snippetId);
     }
 
-    public SnippetVersion findSnippetVersion(String versionId) {
+    public Version findSnippetVersion(String versionId) {
         return snippetVersionRepository.findByVersionId(versionId);
     }
 }

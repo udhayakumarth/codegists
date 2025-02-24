@@ -15,12 +15,12 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/snippet")
-public class SnippetVersionController {
+public class VersionController {
 
     @Autowired
-    SnippetVersionService snippetVersionService;
+    VersionService snippetVersionService;
 
-    Logger log = LoggerFactory.getLogger(SnippetVersionController.class);
+    Logger log = LoggerFactory.getLogger(VersionController.class);
 
     @GetMapping("/{userName}/{snippetId}/version")
     public ResponseEntity<?> findAllSnippetVersion(@PathVariable String userName, @PathVariable String snippetId){
@@ -29,9 +29,9 @@ public class SnippetVersionController {
 
         try{
             if(userName.equals(authUsername)){
-                List<SnippetVersion> snippetVersions = snippetVersionService.findAllSnippetVersion(snippetId);
+                List<Version> versions = snippetVersionService.findAllSnippetVersion(snippetId);
                 log.info("SnippetVersions found successfully for snippetId: {}", snippetId);
-                return ResponseEntity.status(HttpStatus.OK).body(snippetVersions);
+                return ResponseEntity.status(HttpStatus.OK).body(versions);
             }
 
             log.info("Unauthorized access to snippet version attempt by user: {}", authUsername);
@@ -49,7 +49,7 @@ public class SnippetVersionController {
 
         try{
             if(userName.equals(authUsername)){
-                SnippetVersion snippetVersion = snippetVersionService.findSnippetVersion(versionId);
+                Version snippetVersion = snippetVersionService.findSnippetVersion(versionId);
                 log.info("SnippetVersion found successfully for versionId: {}", versionId);
                 return ResponseEntity.status(HttpStatus.OK).body(snippetVersion);
             }

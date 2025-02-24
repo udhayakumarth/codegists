@@ -1,8 +1,9 @@
 package dev.udhayakumar.codegists.snippet;
 
 import dev.udhayakumar.codegists.auth.AuthUtil;
-import dev.udhayakumar.codegists.version.SnippetVersion;
-import dev.udhayakumar.codegists.version.SnippetVersionService;
+import dev.udhayakumar.codegists.file.File;
+import dev.udhayakumar.codegists.file.FileService;
+import dev.udhayakumar.codegists.version.VersionService;
 import io.swagger.v3.oas.annotations.Operation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -12,6 +13,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.lang.reflect.Field;
 import java.net.URI;
 import java.util.List;
 
@@ -23,23 +25,35 @@ public class SnippetController {
     private SnippetService snippetService;
 
     @Autowired
-    private SnippetVersionService snippetVersionService;
+    private VersionService snippetVersionService;
+
+    @Autowired
+    private FileService fileService;
 
     Logger log = LoggerFactory.getLogger(SnippetController.class);
 
     @Operation
     @PostMapping("/{userName}")
-    public ResponseEntity<?> saveSnippet(@PathVariable String userName,@RequestBody Snippet snippet){
+    public ResponseEntity<?> saveSnippet(@PathVariable String userName,@RequestBody SnippetRequestDto snippetRequestDto){
         String authUsername = AuthUtil.getAuthenticatedUsername();
         log.info("Received request to save snippet for user: {}", userName);
 
         try{
             if(userName.equals(authUsername)){
 
-                //setting userName in snippet
-                snippet.setUserName(userName);
+                Snippet snippet = new Snippet(
+                        snippetRequestDto.getName(),
+                        snippetRequestDto.getDescription(),
+                        snippetRequestDto.getPublic(),
+                        userName
+                );
                 String snippetId = snippetService.saveSnippet(snippet);
                 log.info("Snippet saved successfully with ID: {}", snippetId);
+
+                List<File> files = snippetRequestDto.getFiles();
+                files.forEach(file -> file.setSnippetId(snippetId));
+                fileService.saveAll(files);
+                log.info("Files saved successfully");
 
                 //creating URI and setting in header for the created Snippet
                 String location = "/api/snippet/"+userName+"/"+snippetId;
