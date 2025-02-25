@@ -135,6 +135,30 @@ Collections:
 - `GET /api/snippet/{userName}/{snippetId}/versions`
 - `GET /api/snippet/{userName}/{snippetId}/{versionsId}`
 
+
+***
+### New API Desigin
+- `GET /api/auth/login/google`
+- `GET /api/auth/login/google/callback`
+- `GET /api/snippets/{userName}`
+- `GET /api/snippets/{userName}/{snippetId}`
+- `GET /api/files/{snippetId}`
+- `GET /api/files/{snippetId}/{fileId}`
+- `GET /api/files/{snippetId}/versions`
+- `GET /api/files/{snippetId}/{versionId}`
+- `POST /api/snippets/{userName}`
+- `POST /api/files/{snippetId}`
+- `PUT /api/snippets/{userName}/{snippetId}`
+- `PUT /api/files/{snippetId}/{fileId}`
+
+### API Desigin for !nano URL
+- `POST /api/url`
+- `GET /api/url?nanoUrl=https://url.udhayakumarth.life/asHk6`
+
+### DB Desigin for !nano URL
+url(collection):
+urlId, originalUrl, nanoUrl
+ 
 ------------
 ### For Google login
 - http://localhost:8080/api/auth/login/google/callback
