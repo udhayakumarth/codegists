@@ -1,166 +1,49 @@
-## Designing CodeGists
-- Api Documentation: 
-https://documenter.getpostman.com/view/21272460/2sAYXEFJpg
+# **CodeGists** 🗃
+A **lightweight and flexible code snippet manager** with built-in **version control**, **public & secret snippets**, and **multi-file support**.  
 
-- UI Desigin: 
-https://www.figma.com/design/zNWijW6x66dZ4hgGOKQDOQ/CodeGists
-
-### Key Features
-- Version Control
-- Supports Multiple Files
-- Public snippets
-- Secret snippets
-
-### DB Desigin(Mongo)
-Collections:
-- snippets
-- files
-- versions
-- users
-
-### Endpoint
-- `GET /api/auth/login/google`
-- `GET /api/auth/login/google/callback`
-- `POST /api/snippet/{userName}`
-  ```
-  #Request-body
-  {
-		"description": #values,
-		"isPublic": true,
-		"content":[{
-			"fileName": "Udhaya.java",
-			"fileContent": #values,
-			"language": #value,
-		},
-		{
-			"fileName": "Kumar.java",
-			"fileContent": #values,
-			"language": #value,
-		}]	
-  }
-  #Responce
-	status: 201 CREATED
-	location: /api/snippet/{userName}/{snippetId}
-  ```
-  
-- `POST /api/snippet/{userName}/{snippetId}`
-	```
-  #Request-body
-  {
-		"description": #values,
-		"isPublic": false,
-		"content":[{
-			#existingFile
-			"fileId": #value,
-			"fileName": "Udhaya.java",
-			"fileContent": #values,
-			"language": #value,
-			"type": "Intact"
-		},
-		{
-			#existingFileUpdate
-			"fileId": #value,
-			"fileName": "Udhaya.java",
-			"fileContent": #values,
-			"language": #value,
-			"type": "update"
-		},
-		{
-			##deleteFile
-			"fileId": #value,
-			"fileName": "Uk.java",
-			"fileContent": #values,
-			"language": #value,
-			"type": "delete"
-		},
-		{
-			#newFile
-			"fileName": "Kumar.java",
-			"fileContent": #values,
-			"language": #value,
-			"type": "new"
-		}]	
-  }
-    #Responce
-	status: 200 OK
-	location: /api/snippet/{userName}/{snippetId}
-  ```
-  
-- `DELETE /api/snipprt/{username}/{snippetId}`
-```
-#Responce
-	status: 204 No Content
-```
-
-- `GET /api/snippet/{userName}/{snippetId}`
-```
-#Responce-body
-{
-	{
-		"snippetId": #value,
-		"versionsId": #value,
-		"description": #values,
-		"isPublic": false,
-		"content":[{
-			"fileId": #value,
-			"fileName": "Udhaya.java",
-			"fileContent": #values,
-			"language": #value,	
-		},
-		{
-			"fileId": #value,
-			"fileName": "Udhaya.java",
-			"fileContent": #values,
-			"language": #value,
-		},
-		{
-			"fileId": #value,
-			"fileName": "Uk.java",
-			"fileContent": #value,
-			"language": #value,
-		},
-		{
-			"fileId": #value,
-			"fileName": "Kumar.java",
-			"fileContent": #values,
-			"language": #value,
-		}]
-		"createdAt": #value,
-		"updateAt": #value,
-		"createdBy": #value,
-		"updateBy": #value
-  }
-}
-```
-- `GET /api/snippet/{userName}/{snippetId}/versions`
-- `GET /api/snippet/{userName}/{snippetId}/{versionsId}`
+## **✨ Key Features**  
+✔ **Version Control** – Keep track of snippet changes over time.  
+✔ **Supports Multiple Files** – Each snippet can have multiple associated files.  
+✔ **Public & Secret Snippets** – Share code with the world or keep it private.  
+✔ **Google Authentication** – Secure login with Google OAuth.  
 
 
-***
-### New API Desigin
-- `GET /api/auth/login/google`
-- `GET /api/auth/login/google/callback`
-- `GET /api/snippets/{userName}`
-- `GET /api/snippets/{userName}/{snippetId}`
-- `GET /api/files/{snippetId}`
-- `GET /api/files/{snippetId}/{fileId}`
-- `GET /api/files/{snippetId}/versions`
-- `GET /api/files/{snippetId}/{versionId}`
-- `POST /api/snippets/{userName}`
-- `POST /api/files/{snippetId}`
-- `PUT /api/snippets/{userName}/{snippetId}`
-- `PUT /api/files/{snippetId}/{fileId}`
+## **🛠️ Architecture**  
 
-### API Desigin for !nano URL
-- `POST /api/url`
-- `GET /api/url?nanoUrl=https://url.udhayakumarth.life/asHk6`
+![Architecture Diagram](https://github.com/user-attachments/assets/2b86eaff-d6f2-49d2-9357-390051d8bec5)  
 
-### DB Desigin for !nano URL
-url(collection):
-urlId, originalUrl, nanoUrl
- 
-------------
-### For Google login
-- http://localhost:8080/api/auth/login/google/callback
 
-- http://localhost:8080/api/auth/login/google
+## **📜 API Documentation**  
+🔗 **Postman API Docs:** (https://documenter.getpostman.com/view/21272460/2sAYXEFJpg)  
+
+## **🎨 UI Design**  
+🔗 **Figma Prototype:** (https://www.figma.com/design/zNWijW6x66dZ4hgGOKQDOQ/CodeGists)  
+
+
+## **🗄️ Database Design (MongoDB)**  
+**Collections:**  
+📂 `snippets` 
+📂 `files`  
+📂 `versions` 
+📂 `users`   
+
+
+## **📡 API Endpoints**  
+### **Authentication**  
+- `GET /api/auth/login/google` – Login via Google  
+- `GET /api/auth/login/google/callback` – Handle Google OAuth callback  
+
+### **Snippets**  
+- `GET /api/snippets/{userName}` – Fetch all snippets by user  
+- `GET /api/snippets/{userName}/{snippetId}` – Fetch a specific snippet  
+- `POST /api/snippets/{userName}` – Create a new snippet  
+- `PUT /api/snippets/{userName}/{snippetId}` – Update a snippet  
+- `DELETE /api/snippets/{userName}/{snippetId}` – Delete a snippet  
+
+### **Files**  
+- `GET /api/files/{userName}/{snippetId}` – Fetch all files in a snippet  
+- `GET /api/files/{userName}/{snippetId}/{fileId}` – Fetch a specific file  
+- `GET /api/files/{userName}/{snippetId}/versions` – Fetch snippet version history  
+- `POST /api/files/{userName}/{snippetId}` – Upload a new file  
+- `PUT /api/files/{userName}/{snippetId}/{fileId}` – Update a file  
+- `DELETE /api/files/{userName}/{snippetId}` – Delete a file  
