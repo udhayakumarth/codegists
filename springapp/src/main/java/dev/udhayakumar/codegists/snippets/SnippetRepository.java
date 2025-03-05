@@ -1,4 +1,4 @@
-package dev.udhayakumar.codegists.snippet;
+package dev.udhayakumar.codegists.snippets;
 
 import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.stereotype.Repository;

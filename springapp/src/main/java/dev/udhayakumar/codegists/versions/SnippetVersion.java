@@ -1,4 +1,4 @@
-package dev.udhayakumar.codegists.version;
+package dev.udhayakumar.codegists.versions;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import org.springframework.data.annotation.CreatedDate;

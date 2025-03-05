@@ -1,4 +1,4 @@
-package dev.udhayakumar.codegists.snippet;
+package dev.udhayakumar.codegists.snippets;
 
 
 import org.springframework.data.annotation.CreatedDate;

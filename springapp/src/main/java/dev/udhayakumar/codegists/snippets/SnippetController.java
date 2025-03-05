@@ -1,8 +1,8 @@
-package dev.udhayakumar.codegists.snippet;
+package dev.udhayakumar.codegists.snippets;
 
 import dev.udhayakumar.codegists.auth.AuthUtil;
-import dev.udhayakumar.codegists.version.SnippetVersion;
-import dev.udhayakumar.codegists.version.SnippetVersionService;
+import dev.udhayakumar.codegists.versions.SnippetVersion;
+import dev.udhayakumar.codegists.versions.SnippetVersionService;
 import io.swagger.v3.oas.annotations.Operation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -10,13 +10,15 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import java.net.URI;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/snippet")
+@RequestMapping("/api/snippets")
 public class SnippetController {
 
     @Autowired
@@ -31,7 +33,6 @@ public class SnippetController {
     @PostMapping("/{userName}")
     public ResponseEntity<?> saveSnippet(@PathVariable String userName,@RequestBody Snippet snippet){
         String authUsername = AuthUtil.getAuthenticatedUsername();
-        log.info("Received request to save snippet for user: {}", userName);
 
         try{
             if(userName.equals(authUsername)){
@@ -59,19 +60,17 @@ public class SnippetController {
 
     @Operation
     @GetMapping("/{userName}")
-    public ResponseEntity<?> findSnippet(@PathVariable String userName){
-        String authUsername = AuthUtil.getAuthenticatedUsername();
-        log.info("Received request to find all snippet for user: {}", userName);
-
+    @PreAuthorize("#userName == authentication.name")
+    public ResponseEntity<?> findSnippets(@PathVariable String userName){
         try{
-            if(userName.equals(authUsername)){
-                List<Snippet> snippets = snippetService.findSnippet(userName);
-                if(!snippets.isEmpty()){
-                    return ResponseEntity.status(HttpStatus.OK).body(snippets);
-                }
-                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+            List<Snippet> snippets = snippetService.findSnippet(userName);
+            if(!snippets.isEmpty()){
+                log.info("Snippet found successfully for userName: {}", userName);
+                return ResponseEntity.status(HttpStatus.OK).body(snippets);
             }
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(null);
+            log.info("Snippet Not found for userName: {}", userName);
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+
         } catch (Exception e) {
             log.error("Error occurred while finding all snippets for user: {} - {}", userName, e.getMessage(), e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
@@ -82,7 +81,6 @@ public class SnippetController {
     @GetMapping("/{userName}/{snippetId}")
     public ResponseEntity<?> findSnippet(@PathVariable String userName, @PathVariable String snippetId){
         String authUsername = AuthUtil.getAuthenticatedUsername();
-        log.info("Received request to find snippet for snippetId: /{}/{}", userName,snippetId);
 
         try {
             Snippet snippet = snippetService.findSnippetById(snippetId);
@@ -104,7 +102,6 @@ public class SnippetController {
     @PutMapping("/{userName}")
     public ResponseEntity<?> editSnippet(@PathVariable String userName, @RequestBody SnippetVersion snippetVersion){
         String authUsername = AuthUtil.getAuthenticatedUsername();
-        log.info("Received request to edit snippet for user: {}", userName);
 
         try {
             if (userName.equals(authUsername)) {
@@ -127,7 +124,6 @@ public class SnippetController {
     @DeleteMapping("/{userName}/{snippetId}")
     public ResponseEntity<?> deleteSnippet(@PathVariable String userName, @PathVariable String snippetId){
         String authUsername = AuthUtil.getAuthenticatedUsername();
-        log.info("Received request to delete snippet for snippetId: {}", snippetId);
 
         try {
             log.info("userName.equals(authUsername):{},{}",userName,authUsername);

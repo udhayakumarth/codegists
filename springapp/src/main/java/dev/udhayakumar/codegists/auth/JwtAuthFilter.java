@@ -1,7 +1,7 @@
 package dev.udhayakumar.codegists.auth;
 
-import dev.udhayakumar.codegists.user.User;
-import dev.udhayakumar.codegists.user.UserRepository;
+import dev.udhayakumar.codegists.users.User;
+import dev.udhayakumar.codegists.users.UserRepository;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -36,7 +36,7 @@ public class JwtAuthFilter extends OncePerRequestFilter {
         if (userName != null && jwtService.validateToken(token)) {
             User user = userRepository.findByUserName(userName).orElseThrow();
             UsernamePasswordAuthenticationToken authentication =
-                    new UsernamePasswordAuthenticationToken(user, null, new ArrayList<>());
+                    new UsernamePasswordAuthenticationToken(user.getUserName(), null, new ArrayList<>());
             SecurityContextHolder.getContext().setAuthentication(authentication);
         }
         filterChain.doFilter(request, response);

@@ -1,11 +1,10 @@
-package dev.udhayakumar.codegists.snippet;
+package dev.udhayakumar.codegists.snippets;
 
-import dev.udhayakumar.codegists.version.FileVersion;
-import dev.udhayakumar.codegists.version.SnippetVersion;
+import dev.udhayakumar.codegists.versions.FileVersion;
+import dev.udhayakumar.codegists.versions.SnippetVersion;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @Service

@@ -1,13 +1,23 @@
-package dev.udhayakumar.codegists.version;
+package dev.udhayakumar.codegists.snippets;
 
 import org.bson.types.ObjectId;
 
-public class FileVersion {
+public class File {
     private String fileId;
     private String fileName;
     private String fileContent;
     private String language;
-    private String type;
+
+    public File() {
+        this.fileId = new ObjectId().toHexString();
+    }
+
+    public File(String fileName, String fileContent, String language) {
+        this.fileId = new ObjectId().toHexString();
+        this.fileName = fileName;
+        this.fileContent = fileContent;
+        this.language = language;
+    }
 
     public String getFileId() {
         return fileId;
@@ -39,13 +49,5 @@ public class FileVersion {
 
     public void setLanguage(String language) {
         this.language = language;
-    }
-
-    public String getType() {
-        return type;
-    }
-
-    public void setType(String type) {
-        this.type = type;
     }
 }

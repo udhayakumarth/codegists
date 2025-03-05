@@ -1,4 +1,4 @@
-package dev.udhayakumar.codegists.user;
+package dev.udhayakumar.codegists.users;
 
 import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.stereotype.Repository;

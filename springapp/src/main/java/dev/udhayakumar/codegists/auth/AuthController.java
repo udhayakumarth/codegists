@@ -20,18 +20,31 @@ public class AuthController {
     @Autowired
     private GoogleAuthService googleAuthService;
 
-    Logger logger = LoggerFactory.getLogger(AuthController.class);
+    Logger log = LoggerFactory.getLogger(AuthController.class);
 
     @GetMapping("/login/google")
     public ResponseEntity<?> googleAuth(){
-        HttpHeaders httpHeaders = new HttpHeaders();
-        httpHeaders.setLocation(URI.create(googleAuthService.getGoogleAuthUrl()));
-        logger.info(googleAuthService.getGoogleAuthUrl());
-        return ResponseEntity.status(HttpStatus.TEMPORARY_REDIRECT).headers(httpHeaders).body("");
+        try{
+            URI uri = URI.create(googleAuthService.getGoogleAuthUrl());
+            HttpHeaders httpHeaders = new HttpHeaders();
+            httpHeaders.setLocation(uri);
+            log.info("Redirect URI: {}", uri);
+            return ResponseEntity.status(HttpStatus.TEMPORARY_REDIRECT).headers(httpHeaders).body("");
+        } catch (Exception e) {
+            log.error("Error occurred for Google Login: {}", e.getMessage(), e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+        }
+
     }
 
     @GetMapping("login/google/callback")
     public ResponseEntity<?> googleCallback(@RequestParam("code") String code) {
-        return ResponseEntity.status(HttpStatus.OK).body(googleAuthService.authenticateWithGoogle(code));
+        try{
+            return ResponseEntity.status(HttpStatus.OK).body(googleAuthService.authenticateWithGoogle(code));
+        } catch (Exception e) {
+            log.error("Error occurred for Google Login Callback: {}", e.getMessage(), e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+        }
+
     }
 }

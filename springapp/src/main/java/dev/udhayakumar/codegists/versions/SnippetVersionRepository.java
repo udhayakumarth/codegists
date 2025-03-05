@@ -1,4 +1,4 @@
-package dev.udhayakumar.codegists.version;
+package dev.udhayakumar.codegists.versions;
 
 import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.stereotype.Repository;

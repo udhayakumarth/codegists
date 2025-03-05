@@ -1,4 +1,4 @@
-package dev.udhayakumar.codegists.version;
+package dev.udhayakumar.codegists.versions;
 
 import dev.udhayakumar.codegists.auth.AuthUtil;
 import org.slf4j.Logger;

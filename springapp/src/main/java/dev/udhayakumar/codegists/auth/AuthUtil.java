@@ -1,6 +1,6 @@
 package dev.udhayakumar.codegists.auth;
 
-import dev.udhayakumar.codegists.user.User;
+import dev.udhayakumar.codegists.users.User;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 

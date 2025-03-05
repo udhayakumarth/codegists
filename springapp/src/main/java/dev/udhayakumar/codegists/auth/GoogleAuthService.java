@@ -1,7 +1,7 @@
 package dev.udhayakumar.codegists.auth;
 
-import dev.udhayakumar.codegists.user.User;
-import dev.udhayakumar.codegists.user.UserRepository;
+import dev.udhayakumar.codegists.users.User;
+import dev.udhayakumar.codegists.users.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.*;

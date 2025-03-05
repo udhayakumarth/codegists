@@ -1,6 +1,8 @@
 package dev.udhayakumar.codegists.auth;
 
-import dev.udhayakumar.codegists.user.User;
+import dev.udhayakumar.codegists.users.User;
+import jakarta.annotation.PostConstruct;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
@@ -9,7 +11,16 @@ import java.util.Date;
 
 @Service
 public class JwtService {
-    private static final String SECRET_KEY = "QWxhZGRpbjpvcGVuIHNlc2FtZQpN2YKp3X1eFb0lmKtL==";
+
+    @Value("${jwt.secret}")
+    private String secret;
+
+    private static String SECRET_KEY;
+
+    @PostConstruct
+    public void init() {
+        SECRET_KEY = secret;
+    }
 
     public String generateToken(User user) {
         return Jwts.builder()
