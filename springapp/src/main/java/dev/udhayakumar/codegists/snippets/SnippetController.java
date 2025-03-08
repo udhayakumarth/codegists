@@ -1,6 +1,7 @@
 package dev.udhayakumar.codegists.snippets;
 
 import dev.udhayakumar.codegists.auth.AuthUtil;
+import dev.udhayakumar.codegists.config.GlobalExceptionHandler;
 import dev.udhayakumar.codegists.versions.SnippetVersion;
 import dev.udhayakumar.codegists.versions.SnippetVersionService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -61,7 +62,7 @@ public class SnippetController {
     @Operation
     @GetMapping("/{userName}")
     @PreAuthorize("#userName == authentication.name")
-    public ResponseEntity<?> findSnippets(@PathVariable String userName){
+    public ResponseEntity<?> findSnippets(@PathVariable String userName) throws Exception {
         try{
             List<Snippet> snippets = snippetService.findSnippet(userName);
             if(!snippets.isEmpty()){
@@ -73,7 +74,7 @@ public class SnippetController {
 
         } catch (Exception e) {
             log.error("Error occurred while finding all snippets for user: {} - {}", userName, e.getMessage(), e);
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+            throw new Exception(e);
         }
     }
 

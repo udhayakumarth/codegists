@@ -27,8 +27,14 @@ public class SecurityConfig {
                         .requestMatchers("/v3/api-docs/**").permitAll()// Public endpoints
                         .anyRequest().authenticated() // All other endpoints require authentication
                 )
+                .exceptionHandling(exception -> exception.authenticationEntryPoint(customAuthenticationEntryPoint()))
                 .addFilterBefore(jwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class);
         return http.build();
+    }
+
+    @Bean
+    public CustomAuthenticationEntryPoint customAuthenticationEntryPoint(){
+        return new CustomAuthenticationEntryPoint();
     }
 
     @Bean
