@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class SnippetService {
@@ -21,48 +22,32 @@ public class SnippetService {
         return snippetRepository.findByUserName(userName);
     }
 
-    public Snippet findSnippetById(String snippetId) {
+    public Optional<Snippet> findSnippetById(String snippetId) {
         return snippetRepository.findBySnippetId(snippetId);
     }
 
-    public String editSnippet(SnippetVersion snippetVersion) {
-        Snippet snippet = snippetRepository.findBySnippetId(snippetVersion.getSnippetId());
+    public String editSnippet(SnippetVersion snippetVersion){
+        try{
+            Optional<Snippet>  optionalSnippet = snippetRepository.findBySnippetId(snippetVersion.getSnippetId());
+            if(optionalSnippet.isPresent()){
+                Snippet snippet = optionalSnippet.get();
+                if(snippetVersion.getDescription() != null)
+                    snippet.setDescription(snippetVersion.getDescription());
+                if(snippetVersion.getPublic() != null)
+                    snippet.setPublic(snippetVersion.getPublic());
 
-        if(snippetVersion.getDescription() != null)
-            snippet.setDescription(snippetVersion.getDescription());
-        if(snippetVersion.getPublic() != null)
-            snippet.setPublic(snippetVersion.getPublic());
-        if(snippetVersion.getFiles() != null){
-            for (FileVersion fileVersion: snippetVersion.getFiles()){
-                switch (fileVersion.getType()) {
-                    case "new" -> {
-                        File file = new File(
-                                fileVersion.getFileName(),
-                                fileVersion.getFileContent(),
-                                fileVersion.getLanguage()
-                        );
-                        snippet.addFile(file);
-                    }
-                    case "update" -> {
-                        File file = snippet.getFileById(fileVersion.getFileId());
-                        int fileIndex = snippet.getFileIndexByFileId(fileVersion.getFileId());
-                        file.setFileName(fileVersion.getFileName());
-                        file.setFileContent(fileVersion.getFileContent());
-                        file.setLanguage(fileVersion.getLanguage());
-                        snippet.getFiles().set(fileIndex,file);
-                    }
-                    case "delete" -> {
-                        int fileIndex = snippet.getFileIndexByFileId(fileVersion.getFileId());
-                        snippet.getFiles().remove(fileIndex);
-                    }
-                }
+                snippetRepository.save(snippet);
+                return snippetRepository.save(snippet).getSnippetId();
             }
+            return null;
+        } catch (Exception e) {
+            throw new RuntimeException(e);
         }
-        snippetRepository.save(snippet);
-        return snippetRepository.save(snippet).getSnippetId();
     }
 
     public void deleteSnippet(String snippetId) {
-        snippetRepository.delete(findSnippetById(snippetId));
+        Optional<Snippet> snippet = findSnippetById(snippetId);
+        snippet.ifPresent(value -> snippetRepository.delete(value));
+
     }
 }

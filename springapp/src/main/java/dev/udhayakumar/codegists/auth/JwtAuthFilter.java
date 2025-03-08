@@ -60,10 +60,8 @@ public class JwtAuthFilter extends OncePerRequestFilter {
             ErrorResponseDto errorResponseDto = new ErrorResponseDto(HttpStatus.UNAUTHORIZED.value(), "Unauthorized", ex.getMessage(), request.getRequestURI());
             response.getWriter().write(objectMapper.writeValueAsString(errorResponseDto));
         } catch (Exception ex) {
-            response.setStatus(HttpStatus.INTERNAL_SERVER_ERROR.value());
-            response.setContentType(MediaType.APPLICATION_JSON_VALUE);
-            ErrorResponseDto errorResponseDto = new ErrorResponseDto(HttpStatus.INTERNAL_SERVER_ERROR.value(), "Internal Server Error", ex.getMessage(), request.getRequestURI());
-            response.getWriter().write(objectMapper.writeValueAsString(errorResponseDto));
+            log.error("Exception: [token: {}], [error: {}]",authHeader,ex.getMessage());
+            throw new ServletException(ex);
         }
     }
 }

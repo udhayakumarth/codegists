@@ -1,10 +1,12 @@
 package dev.udhayakumar.codegists.snippets;
 
 import dev.udhayakumar.codegists.auth.AuthUtil;
+import dev.udhayakumar.codegists.config.ErrorResponseDto;
 import dev.udhayakumar.codegists.config.GlobalExceptionHandler;
 import dev.udhayakumar.codegists.versions.SnippetVersion;
 import dev.udhayakumar.codegists.versions.SnippetVersionService;
 import io.swagger.v3.oas.annotations.Operation;
+import jakarta.servlet.http.HttpServletRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,6 +19,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.net.URI;
 import java.util.List;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/snippets")
@@ -32,7 +35,7 @@ public class SnippetController {
 
     @Operation
     @PostMapping("/{userName}")
-    public ResponseEntity<?> saveSnippet(@PathVariable String userName,@RequestBody Snippet snippet){
+    public ResponseEntity<?> saveSnippet(@PathVariable String userName,@RequestBody Snippet snippet) throws Exception {
         String authUsername = AuthUtil.getAuthenticatedUsername();
 
         try{
@@ -55,13 +58,12 @@ public class SnippetController {
 
         } catch (Exception e) {
             log.error("Error occurred while saving snippet for user: {} - {}", userName, e.getMessage(), e);
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+            throw new Exception(e);
         }
     }
 
     @Operation
     @GetMapping("/{userName}")
-    @PreAuthorize("#userName == authentication.name")
     public ResponseEntity<?> findSnippets(@PathVariable String userName) throws Exception {
         try{
             List<Snippet> snippets = snippetService.findSnippet(userName);
@@ -80,28 +82,33 @@ public class SnippetController {
 
     @Operation
     @GetMapping("/{userName}/{snippetId}")
-    public ResponseEntity<?> findSnippet(@PathVariable String userName, @PathVariable String snippetId){
+    public ResponseEntity<?> findSnippet(@PathVariable String userName, @PathVariable String snippetId, HttpServletRequest request) throws Exception {
         String authUsername = AuthUtil.getAuthenticatedUsername();
 
         try {
-            Snippet snippet = snippetService.findSnippetById(snippetId);
+            Optional<Snippet> snippet = snippetService.findSnippetById(snippetId);
+            if(snippet.isEmpty()){
+                log.error("Snippet not found successfully for snippetId: {}", snippetId);
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ErrorResponseDto(HttpStatus.NOT_FOUND.value(),"Not Fount","Snippet Not Found for id: "+snippetId, request.getRequestURI()));
+            }
             log.info("Snippet found successfully for snippetId: {}", snippetId);
-            if(!snippet.getUserName().equals(userName))
+            if(!snippet.get().getUserName().equals(userName))
                 log.info("Snippet belongs to different user. snippetId: {}", snippetId);
-            if(userName.equals(authUsername) || snippet.getPublic())
+            if(userName.equals(authUsername) || snippet.get().getPublic()) {
+                log.info("Snippet is public or owned by user. snippetId: {}", snippetId);
                 return ResponseEntity.status(HttpStatus.OK).body(snippet);
-
+            }
             log.info("Unauthorized access snippet is not public for snippetId: {}", snippetId);
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
         } catch (Exception e) {
             log.error("Error occurred while finding snippet for snippetId: {} - {}", snippetId, e.getMessage(), e);
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+            throw new Exception(e);
         }
     }
 
     @Operation
     @PutMapping("/{userName}")
-    public ResponseEntity<?> editSnippet(@PathVariable String userName, @RequestBody SnippetVersion snippetVersion){
+    public ResponseEntity<?> editSnippet(@PathVariable String userName, @RequestBody SnippetVersion snippetVersion) throws Exception {
         String authUsername = AuthUtil.getAuthenticatedUsername();
 
         try {
@@ -117,27 +124,27 @@ public class SnippetController {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body(null);
         } catch (Exception e) {
             log.error("Error occurred while editing snippet for user: {} - {}", userName, e.getMessage(), e);
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+            throw new Exception(e);
         }
     }
 
     @Operation
     @DeleteMapping("/{userName}/{snippetId}")
-    public ResponseEntity<?> deleteSnippet(@PathVariable String userName, @PathVariable String snippetId){
-        String authUsername = AuthUtil.getAuthenticatedUsername();
-
+    @PreAuthorize("#userName == authentication.name")
+    public ResponseEntity<?> deleteSnippet(@PathVariable String userName, @PathVariable String snippetId, HttpServletRequest request) throws Exception {
+        log.error("Snippet not found successfully for snippetId:");
         try {
-            log.info("userName.equals(authUsername):{},{}",userName,authUsername);
-            if (userName.equals(authUsername)) {
-                snippetService.deleteSnippet(snippetId);
-                log.info("Snippet delete successfully for snippetId: {}", snippetId);
-                return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
+            Optional<Snippet> snippet = snippetService.findSnippetById(snippetId);
+            if(snippet.isEmpty()){
+                log.error("Snippet not found successfully for snippetId: {}", snippetId);
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ErrorResponseDto(HttpStatus.NOT_FOUND.value(),"Not Fount","Snippet Not Found for id: "+snippetId, request.getRequestURI()));
             }
-            log.warn("Unauthorized snippet delete attempt by user: {}", authUsername);
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(null);
+            snippetService.deleteSnippet(snippetId);
+            log.info("Snippet delete successfully for snippetId: {}", snippetId);
+            return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
         } catch (Exception e) {
             log.error("Error occurred while deleting snippet for user: {} - {}", userName, e.getMessage(), e);
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+            throw new Exception(e);
         }
     }
 }
