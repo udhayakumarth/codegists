@@ -1,40 +1,56 @@
 package dev.udhayakumar.codegists.files;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import org.slf4j.Logger;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.io.IOException;
+import java.net.URI;
+
 @RestController
-@RequestMapping("/api/files/{username}")
+@RequestMapping("/api/files/{userName}")
 public class FileController {
 
+    @Autowired
+    FileService fileService;
+
     @GetMapping("/{snippetId}")
-    public ResponseEntity<JsonNode> getFilesBySnippetId(){
-        return null;
+    public ResponseEntity<?> getFilesBySnippetId(@PathVariable String snippetId){
+        return ResponseEntity.status(HttpStatus.OK).body(fileService.getFilesBySnippetId(snippetId));
     }
 
     @GetMapping("/{snippetId}/{fileId}")
-    public ResponseEntity<JsonNode> getFileById(){
+    public ResponseEntity<?> getFileById(){
         return null;
     }
 
     @GetMapping("/{snippetId}/versions")
-    public ResponseEntity<JsonNode> getFileVersionsBySnippetId(){
+    public ResponseEntity<?> getFileVersionsBySnippetId(){
         return null;
     }
 
     @GetMapping("/{snippetId}/{versionId}")
-    public ResponseEntity<JsonNode> getFileByVersionId(){
+    public ResponseEntity<?> getFileByVersionId(){
         return null;
     }
 
     @PostMapping("/{snippetId}")
-    public ResponseEntity<JsonNode> postFile(){
-        return null;
+    public ResponseEntity<?> postFile(@PathVariable String userName, @PathVariable String snippetId, @RequestBody FileRequestDto fileRequestDto) throws IOException {
+        String fileId = fileService.postFile(snippetId, fileRequestDto);
+
+        String location = "/api/snippet/"+userName+"/"+snippetId+"/"+fileId;
+        HttpHeaders httpHeaders = new HttpHeaders();
+        httpHeaders.setLocation(URI.create(location));
+
+        return ResponseEntity.status(HttpStatus.CREATED).headers(httpHeaders).body(null);
     }
 
     @PutMapping("/{snippetId}")
-    public ResponseEntity<JsonNode> putFile(){
+    public ResponseEntity<?> putFile(){
         return null;
     }
 }
