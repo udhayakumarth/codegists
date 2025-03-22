@@ -33,8 +33,8 @@ public class SecurityConfig {
     }
 
     @Bean
-    public CustomAuthenticationEntryPoint customAuthenticationEntryPoint(){
-        return new CustomAuthenticationEntryPoint();
+    public AuthenticationEntryPoint customAuthenticationEntryPoint(){
+        return new AuthenticationEntryPoint();
     }
 
     @Bean

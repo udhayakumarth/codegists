@@ -15,7 +15,6 @@ public class Snippet {
     private String snippetId;
     private String description;
     private Boolean isPublic;
-    private List<File> files;
     private String userName;
     @CreatedDate
     private Date createdAt;
@@ -53,14 +52,6 @@ public class Snippet {
         isPublic = aPublic;
     }
 
-    public List<File> getFiles() {
-        return files;
-    }
-
-    public void setFiles(List<File> files) {
-        this.files = files;
-    }
-
     public String getUserName() {
         return userName;
     }
@@ -85,23 +76,5 @@ public class Snippet {
         this.updatedAt = updatedAt;
     }
 
-    public void addFile(File file){
-        files.add(file);
-    }
 
-    public File getFileById(String fileId) {
-        return files.stream()
-                .filter(file -> file.getFileId().equals(fileId))
-                .findFirst()
-                .orElse(null); // Return null if not found
-    }
-
-    public int getFileIndexByFileId(String fileId){
-        for (int i = 0; i < files.size(); i++) {
-            if (files.get(i).getFileId().equals(fileId)) {
-                return i;
-            }
-        }
-        return -1;
-    }
 }

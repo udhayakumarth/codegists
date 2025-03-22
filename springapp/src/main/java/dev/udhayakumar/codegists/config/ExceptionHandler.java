@@ -8,16 +8,15 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.servlet.resource.NoResourceFoundException;
 
 @RestControllerAdvice
-public class GlobalExceptionHandler {
+public class ExceptionHandler {
 
-    private static final Logger log = LoggerFactory.getLogger(GlobalExceptionHandler.class);
+    private static final Logger log = LoggerFactory.getLogger(ExceptionHandler.class);
 
-    @ExceptionHandler(AccessDeniedException.class)
+    @org.springframework.web.bind.annotation.ExceptionHandler(AccessDeniedException.class)
     public ResponseEntity<ErrorResponseDto> handleAccessDeniedException(AccessDeniedException ex, HttpServletRequest request) {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         String username = auth.getName();
@@ -25,13 +24,13 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ErrorResponseDto(HttpStatus.NOT_FOUND.value(),"Not found",ex.getMessage(), request.getPathInfo()));
     }
 
-    @ExceptionHandler(Exception.class)
+    @org.springframework.web.bind.annotation.ExceptionHandler(Exception.class)
     public ResponseEntity<ErrorResponseDto> handleGeneralException(Exception ex, HttpServletRequest request) {
         log.error("Error occurred at [Path: {}] [Error: {}]", request.getRequestURI(), ex.getMessage());
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ErrorResponseDto(HttpStatus.INTERNAL_SERVER_ERROR.value(),"Internal Server Error",ex.getMessage(), request.getRequestURI()));
     }
 
-    @ExceptionHandler(NoResourceFoundException.class)
+    @org.springframework.web.bind.annotation.ExceptionHandler(NoResourceFoundException.class)
     public ResponseEntity<ErrorResponseDto> handleNoResourceFoundException(Exception ex, HttpServletRequest request){
         log.error("Error occurred at [Path: {}] [Error: {}]", request.getRequestURI(), ex.getMessage());
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ErrorResponseDto(HttpStatus.NOT_FOUND.value(),"Not Found",ex.getMessage(), request.getRequestURI()));

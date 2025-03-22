@@ -2,7 +2,6 @@ package dev.udhayakumar.codegists.snippets;
 
 import dev.udhayakumar.codegists.auth.AuthUtil;
 import dev.udhayakumar.codegists.config.ErrorResponseDto;
-import dev.udhayakumar.codegists.config.GlobalExceptionHandler;
 import dev.udhayakumar.codegists.versions.SnippetVersion;
 import dev.udhayakumar.codegists.versions.SnippetVersionService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -14,7 +13,6 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import java.net.URI;
@@ -35,27 +33,18 @@ public class SnippetController {
 
     @Operation
     @PostMapping("/{userName}")
+    @PreAuthorize("#userName == authentication.name")
     public ResponseEntity<?> saveSnippet(@PathVariable String userName,@RequestBody Snippet snippet) throws Exception {
-        String authUsername = AuthUtil.getAuthenticatedUsername();
-
         try{
-            if(userName.equals(authUsername)){
+            snippet.setUserName(userName);
+            String snippetId = snippetService.saveSnippet(snippet);
+            log.info("Snippet saved successfully with ID: {}", snippetId);
 
-                //setting userName in snippet
-                snippet.setUserName(userName);
-                String snippetId = snippetService.saveSnippet(snippet);
-                log.info("Snippet saved successfully with ID: {}", snippetId);
+            String location = "/api/snippet/"+userName+"/"+snippetId;
+            HttpHeaders httpHeaders = new HttpHeaders();
+            httpHeaders.setLocation(URI.create(location));
 
-                //creating URI and setting in header for the created Snippet
-                String location = "/api/snippet/"+userName+"/"+snippetId;
-                HttpHeaders httpHeaders = new HttpHeaders();
-                httpHeaders.setLocation(URI.create(location));
-
-                return ResponseEntity.status(HttpStatus.CREATED).headers(httpHeaders).body(null);
-            }
-            log.warn("Unauthorized snippet submission attempt by user: {}", authUsername);
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(null);
-
+            return ResponseEntity.status(HttpStatus.CREATED).headers(httpHeaders).body(null);
         } catch (Exception e) {
             log.error("Error occurred while saving snippet for user: {} - {}", userName, e.getMessage(), e);
             throw new Exception(e);
@@ -64,15 +53,16 @@ public class SnippetController {
 
     @Operation
     @GetMapping("/{userName}")
+    @PreAuthorize("#userName == authentication.name")
     public ResponseEntity<?> findSnippets(@PathVariable String userName) throws Exception {
         try{
             List<Snippet> snippets = snippetService.findSnippet(userName);
-            if(!snippets.isEmpty()){
-                log.info("Snippet found successfully for userName: {}", userName);
-                return ResponseEntity.status(HttpStatus.OK).body(snippets);
+            if(snippets.isEmpty()){
+                log.error("Snippet not found for userName: {}", userName);
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
             }
-            log.info("Snippet Not found for userName: {}", userName);
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+            log.info("Snippet found successfully for userName: {}", userName);
+            return ResponseEntity.status(HttpStatus.OK).body(snippets);
 
         } catch (Exception e) {
             log.error("Error occurred while finding all snippets for user: {} - {}", userName, e.getMessage(), e);
@@ -92,8 +82,7 @@ public class SnippetController {
                 return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ErrorResponseDto(HttpStatus.NOT_FOUND.value(),"Not Fount","Snippet Not Found for id: "+snippetId, request.getRequestURI()));
             }
             log.info("Snippet found successfully for snippetId: {}", snippetId);
-            if(!snippet.get().getUserName().equals(userName))
-                log.info("Snippet belongs to different user. snippetId: {}", snippetId);
+
             if(userName.equals(authUsername) || snippet.get().getPublic()) {
                 log.info("Snippet is public or owned by user. snippetId: {}", snippetId);
                 return ResponseEntity.status(HttpStatus.OK).body(snippet);
@@ -108,6 +97,7 @@ public class SnippetController {
 
     @Operation
     @PutMapping("/{userName}")
+    @PreAuthorize("#userName == authentication.name")
     public ResponseEntity<?> editSnippet(@PathVariable String userName, @RequestBody SnippetVersion snippetVersion) throws Exception {
         String authUsername = AuthUtil.getAuthenticatedUsername();
 
