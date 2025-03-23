@@ -8,10 +8,13 @@ import software.amazon.awssdk.auth.credentials.StaticCredentialsProvider;
 import software.amazon.awssdk.core.sync.RequestBody;
 import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.s3.S3Client;
+import software.amazon.awssdk.services.s3.model.GetObjectRequest;
 import software.amazon.awssdk.services.s3.model.PutObjectRequest;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.URI;
+import java.nio.charset.StandardCharsets;
 import java.util.UUID;
 
 @Service
@@ -46,5 +49,14 @@ public class R2ObjectStorageService {
         );
 
         return fileId;
+    }
+
+    public String fetchFile(String fileLocation) throws IOException {
+        InputStream inputStream = r2Client.getObject(GetObjectRequest.builder()
+                .bucket(bucketName)
+                .key(fileLocation)
+                .build());
+
+        return new String(inputStream.readAllBytes(), StandardCharsets.UTF_8);
     }
 }

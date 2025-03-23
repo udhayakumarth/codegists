@@ -1,5 +1,6 @@
 package dev.udhayakumar.codegists.files;
 
+import java.time.Instant;
 import java.util.Date;
 
 public class FileResponseDto {
@@ -7,8 +8,17 @@ public class FileResponseDto {
     private String fileName;
     private String fileContent;
     private String language;
-    private Date createdAt;
-    private Date updatedAt;
+    private Instant createdAt;
+    private Instant updatedAt;
+
+    public FileResponseDto(String fileId, String fileName, String fileContent, String language, Instant createdAt, Instant updatedAt) {
+        this.fileId = fileId;
+        this.fileName = fileName;
+        this.fileContent = fileContent;
+        this.language = language;
+        this.createdAt = createdAt;
+        this.updatedAt = updatedAt;
+    }
 
     public String getFileId() {
         return fileId;
@@ -42,19 +52,19 @@ public class FileResponseDto {
         this.language = language;
     }
 
-    public Date getCreatedAt() {
+    public Instant getCreatedAt() {
         return createdAt;
     }
 
-    public void setCreatedAt(Date createdAt) {
+    public void setCreatedAt(Instant createdAt) {
         this.createdAt = createdAt;
     }
 
-    public Date getUpdatedAt() {
+    public Instant getUpdatedAt() {
         return updatedAt;
     }
 
-    public void setUpdatedAt(Date updatedAt) {
+    public void setUpdatedAt(Instant updatedAt) {
         this.updatedAt = updatedAt;
     }
 }

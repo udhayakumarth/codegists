@@ -19,13 +19,13 @@ public class FileController {
     FileService fileService;
 
     @GetMapping("/{snippetId}")
-    public ResponseEntity<?> getFilesBySnippetId(@PathVariable String snippetId){
+    public ResponseEntity<?> getFilesBySnippetId(@PathVariable String snippetId) throws IOException {
         return ResponseEntity.status(HttpStatus.OK).body(fileService.getFilesBySnippetId(snippetId));
     }
 
     @GetMapping("/{snippetId}/{fileId}")
-    public ResponseEntity<?> getFileById(){
-        return null;
+    public ResponseEntity<?> getFileById(@PathVariable String userName, @PathVariable String snippetId, @PathVariable String fileId) throws IOException {
+        return ResponseEntity.status(HttpStatus.OK).body(fileService.getFileById(fileId));
     }
 
     @GetMapping("/{snippetId}/versions")
@@ -33,7 +33,7 @@ public class FileController {
         return null;
     }
 
-    @GetMapping("/{snippetId}/{versionId}")
+    @GetMapping("/{snippetId}/versions/{versionId}")
     public ResponseEntity<?> getFileByVersionId(){
         return null;
     }

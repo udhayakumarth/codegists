@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -44,7 +45,32 @@ public class FileService {
     }
 
 
-    public List<File> getFilesBySnippetId(String snippetId) {
-        return fileRepository.findAllBySnippetId(snippetId);
+    public List<FileResponseDto> getFilesBySnippetId(String snippetId) throws IOException {
+        List<File> files =  fileRepository.findAllBySnippetId(snippetId);
+        List<FileResponseDto> fileResponseDtos = new ArrayList<>();
+        for(File file: files){
+            fileResponseDtos.add(new FileResponseDto(
+                    file.getFileId(),
+                    file.getFileName(),
+                    r2ObjectStorageService.fetchFile(file.getFileLocation()),
+                    file.getLanguage(),
+                    file.getCreatedAt(),
+                    file.getUpdatedAt()
+            ));
+        }
+        return fileResponseDtos;
+    }
+
+    public FileResponseDto getFileById(String fileId) throws IOException {
+        File file = fileRepository.findByFileId(fileId);
+
+        return new FileResponseDto(
+                file.getFileId(),
+                file.getFileName(),
+                r2ObjectStorageService.fetchFile(file.getFileLocation()),
+                file.getLanguage(),
+                file.getCreatedAt(),
+                file.getUpdatedAt()
+        );
     }
 }

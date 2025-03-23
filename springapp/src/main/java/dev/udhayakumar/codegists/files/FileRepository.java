@@ -8,4 +8,6 @@ import java.util.List;
 @Repository
 public interface FileRepository extends MongoRepository<File, String> {
     List<File> findAllBySnippetId(String snippetId);
+
+    File findByFileId(String fileId);
 }
